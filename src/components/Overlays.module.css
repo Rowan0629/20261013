@@ -1,0 +1,208 @@
+/* ---- 進出提示 ---- */
+.toastSlot {
+  position: absolute;
+  z-index: 5;
+  top: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 22px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(30, 33, 39, 0.25);
+  animation: toast-in 0.18s ease-out;
+}
+
+.toastDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--online-on-dark);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* ---- 連線橫幅 ---- */
+.banner {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  border-bottom: 1px solid var(--warn-line);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ---- 刪除確認 ---- */
+.scrim {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(30, 33, 39, 0.5);
+}
+
+.dialog {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+.dialogTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.dialogPreview {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--bg);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-height: 120px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.dialogText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.dialogError {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dialogButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.btnCancel,
+.btnDanger {
+  flex: 1;
+  height: 48px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.btnCancel {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-weight: 500;
+}
+
+.btnDanger {
+  border: 0;
+  background: var(--danger);
+  color: #fff;
+  font-weight: 700;
+}
+
+.btnDanger:disabled {
+  opacity: 0.6;
+}
+
+/* ---- 圖片檢視 ---- */
+.viewer {
+  position: fixed;
+  z-index: 40;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #0e0f12;
+  color: #fff;
+}
+
+.viewerBar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+}
+
+.viewerBtn,
+.viewerDownload {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.viewerBtn {
+  width: 44px;
+}
+
+.viewerDownload {
+  padding: 0 16px;
+}
+
+.viewerStage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 12px;
+}
+
+.viewerImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.viewerCaption {
+  flex: none;
+  padding: 12px 20px 28px;
+  font-size: 14px;
+  color: #c9cdd3;
+}

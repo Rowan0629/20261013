@@ -1,0 +1,49 @@
+.panel {
+  position: fixed;
+  z-index: 100;
+  left: 8px;
+  bottom: 8px;
+  max-width: calc(100vw - 16px);
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(30, 33, 39, 0.92);
+  color: #fff;
+  font-size: 12px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.panel button,
+.reopen {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 12px;
+}
+
+.close {
+  min-height: 24px;
+}
+
+.reopen {
+  position: fixed;
+  z-index: 100;
+  left: 8px;
+  bottom: 8px;
+  background: rgba(30, 33, 39, 0.92);
+}

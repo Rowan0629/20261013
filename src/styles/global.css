@@ -1,0 +1,97 @@
+/* 設計規格見 docs/design.md 第 3 節 */
+:root {
+  --bg: #f5f3ee;
+  --surface: #ffffff;
+  --ink: #1e2127;
+  --ink-2: #4a515c;
+  --ink-3: #646b76;
+  --line: #e2ded5;
+  --accent: #2f4fd8;
+  --accent-soft: #e6ebfd;
+  --accent-on-dark: #d2dafa;
+  --accent-disabled: #c9d1f2;
+  --danger: #b42318;
+  --online: #1f7a4d;
+  --online-on-dark: #5fd08f;
+  --warn-bg: #fff1d6;
+  --warn-ink: #6b4500;
+  --warn-line: #f0d9a8;
+  --dash: #b9b3a5;
+  --font: 'Noto Sans TC', system-ui, -apple-system, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation-duration: 3s;
+  }
+}

@@ -1,0 +1,172 @@
+.composer {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px calc(14px + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+
+.offlineNote {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.previewImg {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.previewInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.previewName {
+  font-size: 13px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.previewSize {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.iconBtn {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 22px;
+  background: transparent;
+  color: var(--ink-2);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.error {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.count,
+.countOver {
+  flex: none;
+  color: var(--ink-3);
+}
+
+.countOver {
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.ghostBtn,
+.sendBtn {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22px;
+}
+
+.ghostBtn {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+}
+
+.ghostBtn:disabled {
+  background: var(--bg);
+  color: #a8adb5;
+}
+
+.sendBtn {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+}
+
+.sendBtn:disabled {
+  background: var(--accent-disabled);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  resize: none;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--bg);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.input:disabled {
+  background: #efede7;
+}
+
+.hint {
+  display: none;
+  padding-left: 54px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hint {
+    display: block;
+  }
+}
+
+@media (min-width: 768px) {
+  .composer {
+    padding: 12px 24px 14px;
+  }
+
+  .row {
+    gap: 10px;
+  }
+
+  .input {
+    padding: 10px 16px;
+  }
+}

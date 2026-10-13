@@ -1,0 +1,290 @@
+.msg {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 82%;
+}
+
+.other {
+  align-items: flex-start;
+  align-self: flex-start;
+}
+
+.mine {
+  align-items: flex-end;
+  align-self: flex-end;
+}
+
+.nick {
+  padding-left: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-3);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  max-width: 100%;
+}
+
+.mine .line {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.time {
+  flex: none;
+  padding-bottom: 2px;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* ---- 泡泡 ---- */
+.bubble {
+  min-width: 0;
+  padding: 9px 13px;
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.bubbleOther {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px 16px 16px 16px;
+}
+
+.bubbleMine {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 16px 4px 16px 16px;
+  cursor: pointer;
+}
+
+.bubbleImage {
+  padding: 4px;
+}
+
+.textWithImage {
+  display: block;
+  padding: 6px 9px 4px;
+}
+
+.edited {
+  margin-left: 6px;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.bubbleMine .edited {
+  color: var(--accent-on-dark);
+}
+
+.imageBtn {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 12px;
+}
+
+.image {
+  display: block;
+  width: 220px;
+  max-width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #e8e4da;
+}
+
+/* ---- 已刪除 ---- */
+.deleted {
+  padding: 9px 13px;
+  border: 1px dashed var(--dash);
+  border-radius: 4px 16px 16px 16px;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--ink-3);
+}
+
+.mine .deleted {
+  border-radius: 16px 4px 16px 16px;
+}
+
+/* ---- 編輯／刪除按鈕（手機：點選訊息後出現在下方） ---- */
+.actions {
+  order: 3;
+  flex-basis: 100%;
+  display: none;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.selected .actions {
+  display: flex;
+}
+
+.actionBtn {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.actionDanger {
+  color: var(--danger);
+}
+
+/* ---- 編輯模式 ---- */
+.editCard {
+  align-self: flex-end;
+  width: 86%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.editLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.editInput {
+  width: 100%;
+  resize: none;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.editError {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.editFoot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editCount,
+.editOver {
+  flex: 1;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.editOver {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.editCancel,
+.editSave {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 22px;
+  font-size: 14px;
+}
+
+.editCancel {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-weight: 500;
+}
+
+.editSave {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.editSave:disabled {
+  background: var(--accent-disabled);
+}
+
+/* ---- 電腦版：滑鼠移上去，編輯／刪除出現在泡泡左側 ---- */
+@media (min-width: 768px) {
+  .msg {
+    max-width: 60%;
+  }
+
+  .bubble {
+    padding: 10px 14px;
+  }
+
+  .bubbleImage {
+    padding: 4px;
+  }
+
+  .image {
+    width: 260px;
+  }
+
+  .mine .line {
+    flex-wrap: nowrap;
+  }
+
+  .actions {
+    order: 0;
+    flex-basis: auto;
+    margin: 0 2px 0 0;
+    padding-bottom: 2px;
+    gap: 4px;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mine:hover .actions,
+  .mine:focus-within .actions {
+    display: flex;
+  }
+
+  .actionBtn {
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+    padding: 0;
+    border-radius: 18px;
+  }
+
+  /* 電腦版只顯示圖示；文字留給螢幕閱讀器 */
+  .actionLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}
