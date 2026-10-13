@@ -181,7 +181,7 @@ Supabase 像一盒工具,我們只用其中四樣:
 
 1. 前端做好後推上 GitHub。
 2. 第 12 節的自動發佈會把網頁更新到 GitHub Pages。
-3. 你用電腦或手機打開網址就能看到效果:`https://rowan0629.github.io/anonymous-chat/`
+3. 你用電腦或手機打開網址就能看到效果:`https://rowan0629.github.io/20261013/`
 4. 階段一**完全不需要任何金鑰**。
 
 ### 階段二:接上 Supabase 之後的改變
@@ -543,11 +543,11 @@ Supabase 像一盒工具,我們只用其中四樣:
 
 ## 11. repo 的資料夾結構
 
-> repo 是專案的資料夾 / 倉庫,這個專案放在 GitHub 的 `Rowan0629/anonymous-chat`。
+> repo 是專案的資料夾 / 倉庫,這個專案放在 GitHub 的 `Rowan0629/20261013`。
 > 下面是**預計**的結構,現在只有 `docs/`、`README.md`、`.gitignore`,其餘是之後要建立的。
 
 ```
-anonymous-chat/
+20261013/
 ├─ docs/
 │  ├─ requirements.md          你寫的需求
 │  └─ architecture.md          本文件
@@ -583,14 +583,14 @@ flowchart LR
     A["你把程式推到 GitHub<br/>(main 分支)"] --> B["GitHub Actions<br/>自動啟動"]
     B --> C["整理成網頁檔案<br/>(帶入公開設定值)"]
     C --> D["發佈到 GitHub Pages"]
-    D --> E["任何人用網址打開<br/>rowan0629.github.io/anonymous-chat/"]
+    D --> E["任何人用網址打開<br/>rowan0629.github.io/20261013/"]
 ```
 
 ### 要點
 
 1. **一次性設定:** 在 GitHub repo 的 **Settings → Pages**,把來源(Source)選成 **GitHub Actions**。
-2. **網站網址:** `https://rowan0629.github.io/anonymous-chat/`。注意網址尾端有 `/anonymous-chat/` 這一段。
-3. **路徑設定:** 前端必須設定「網站放在 `/anonymous-chat/` 底下」,否則網頁找不到自己的檔案,會變成空白頁。這是 GitHub Pages 最常見的第一個坑。
+2. **網站網址:** `https://rowan0629.github.io/20261013/`。注意網址尾端有 `/20261013/` 這一段。
+3. **路徑設定:** 前端必須設定「網站放在 `/20261013/` 底下」,否則網頁找不到自己的檔案,會變成空白頁。這是 GitHub Pages 最常見的第一個坑。
 4. **公開設定值:** 階段二要用的 Project URL 與 Publishable key,放在 GitHub 的 Actions Variables(第 8 節),自動發佈時帶入。階段一不需要。
 5. **重新整理問題:** GitHub Pages 不支援「換一個網址路徑再重新整理」,所以這個應用**只用一個網址**(不做多頁路由),就不會碰到。
 6. **資料庫設定的更新:** 在你自己的電腦上,用 Supabase 命令列工具手動套用(階段二)。**不放進自動發佈**,避免讓 GitHub 持有資料庫密碼這種高權限資料。
@@ -606,7 +606,7 @@ flowchart LR
 ### 階段一:前端 + 模擬器
 
 #### 部署
-- [ ] 推上 GitHub 後,自動發佈成功,`https://rowan0629.github.io/anonymous-chat/` 打得開,不是空白頁
+- [ ] 推上 GitHub 後,自動發佈成功,`https://rowan0629.github.io/20261013/` 打得開,不是空白頁
 - [ ] 電腦(至少兩種瀏覽器)和手機(至少一支)都能正常顯示
 - [ ] 專案裡沒有任何金鑰,`.env.local` 沒被收進 git
 
