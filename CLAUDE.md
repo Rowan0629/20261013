@@ -5,5 +5,5 @@
 ## 規則
 
 - 開始任何工作前,先讀 `docs/architecture.md`。
-- 目前在「階段一」:只做前端與模擬器,還不接 Supabase,也不需要任何金鑰。
+- 目前在「階段二」:前端已接上 Supabase(階段一的前端與模擬器已完成,模擬器保留,`VITE_BACKEND=mock` 即可切回)。只會用到 Project URL 與 Publishable key(可公開),絕不使用 Secret key。
 - 不可以把金鑰檔案 commit 進 git(`.env`、`.env.local` 等)。只有 `.env.example` 可以進 git,且只能放佔位文字。
