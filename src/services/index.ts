@@ -3,7 +3,8 @@ import { createMockChatService, type MockControls } from './mock/mockChatService
 
 // 這裡是「畫面用哪一種後端」唯一的切換點。
 // 階段一只有模擬器；階段二在這裡加上 Supabase 版即可，畫面的程式碼完全不用動。
-const backend = import.meta.env.VITE_BACKEND ?? 'mock';
+// 用 || 而不是 ??：GitHub Actions 讀不到的變數會變成「空字串」而不是「沒有」，空字串也要當作預設的 mock。
+const backend = import.meta.env.VITE_BACKEND || 'mock';
 
 function create(): { service: ChatService; mockControls: MockControls | null } {
   if (backend === 'mock') {
