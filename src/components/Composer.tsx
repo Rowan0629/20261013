@@ -40,7 +40,9 @@ export function Composer({ service, disabled }: Props) {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    el.style.height = `${Math.min(el.scrollHeight, MAX_HEIGHT)}px`;
+    // box-sizing 是 border-box，高度要把上下邊框也算進去，不然一行字就會被判定為溢出而出現捲軸
+    const borders = el.offsetHeight - el.clientHeight;
+    el.style.height = `${Math.min(el.scrollHeight + borders, MAX_HEIGHT)}px`;
   }, [text]);
 
   // 圖片預覽網址用完要釋放

@@ -22,6 +22,13 @@ export interface ChatService {
   /** 登記（或續約）代號。同一個人重複登記自己的代號會成功 */
   claimNickname(name: string): Promise<ClaimResult>;
   releaseNickname(): Promise<void>;
+  /**
+   * 離開線上名單，但「保留」代號（換代號時用）：
+   * 人還在輸入代號的畫面，別人的名單上不該再看到他在線；
+   * 舊代號要保留到新代號登記成功為止，免得新代號被占用時舊代號被搶走。
+   * 之後再次登記成功（claimNickname 回傳 ok），就會重新出現在名單上。
+   */
+  leavePresence(): Promise<void>;
 
   // ---- 讀取訊息（結果都是由舊到新） ----
   loadLatest(limit: number): Promise<Message[]>;

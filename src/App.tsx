@@ -77,6 +77,8 @@ export default function App() {
     const current = phase.kind === 'chat' ? phase.nickname : '';
     // 這裡不釋放舊代號：等新代號登記成功，後端才會一併放掉舊的（一個人同時只占一個代號）。
     // 這樣新代號萬一被占用，舊代號不會被別人搶走。
+    // 但人已經離開聊天室了，別人的線上名單不該再顯示他在線，所以要先離開名單。
+    void chatService.leavePresence().catch(() => undefined);
     setPhase({ kind: 'form', initialName: current, notice: null });
   }, [phase]);
 

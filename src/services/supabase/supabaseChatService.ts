@@ -16,6 +16,7 @@ import type {
   Unsubscribe,
 } from '../../types';
 import type { ChatService } from '../ChatService';
+import { parseMessageRow } from './parseMessage';
 
 const BUCKET = 'chat-images';
 /** 代號是「租」的（租期 60 秒），每 20 秒續租一次。見 docs/architecture.md 6.4 */
@@ -43,9 +44,6 @@ interface MessageRow {
   edited_at: string | null;
   deleted_at: string | null;
 }
-
-const toIso = (value: string | null): string | null =>
-  value === null ? null : new Date(value).toISOString();
 
 /** 資料庫守門函式丟出的錯誤字眼 → 畫面用的錯誤名稱（見 docs/architecture.md 5.5） */
 const DB_ERRORS: Record<string, ChatErrorCode> = {
@@ -91,6 +89,8 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
   let userId = '';
   let accessToken = '';
   let nickname: string | null = null;
+  /** 有代號，而且人在聊天室裡才算「在線」。換代號時代號保留（續租照舊），但人不在名單上 */
+  let inRoom = false;
   let channel: RealtimeChannel | null = null;
   let heartbeat: number | undefined;
   let starting: Promise<{ userId: string }> | null = null;
@@ -110,6 +110,11 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
     listeners.get(event)?.forEach((callback) => callback(payload));
   }
 
+  /** 只有檢查通過的訊息才會送出去；null（不合格）直接丟掉 */
+  function emitMessage(event: 'message:new' | 'message:updated', message: Message | null): void {
+    if (message) emit(event, message);
+  }
+
   function updateConnection(): void {
     const next: ConnectionState = channelReady && browserOnline ? 'connected' : 'reconnecting';
     if (next === connection) return;
@@ -118,21 +123,26 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
   }
 
   // ---------- 資料轉換 ----------
-  function toMessage(row: MessageRow): Message {
-    if (row.image_path) imagePaths.set(row.id, row.image_path);
-    return {
-      id: row.id,
-      userId: row.user_id,
-      nickname: row.nickname,
-      text: row.content,
-      imageUrl: row.image_path
-        ? client.storage.from(BUCKET).getPublicUrl(row.image_path).data.publicUrl
-        : null,
-      createdAt: toIso(row.created_at)!,
-      updatedAt: toIso(row.updated_at)!,
-      editedAt: toIso(row.edited_at),
-      deletedAt: toIso(row.deleted_at),
-    };
+  /** 自己的圖片倉庫的網址開頭；訊息裡的圖片網址必須是這個開頭（見 parseMessage.ts） */
+  const imageUrlPrefix = `${config.url.replace(/\/+$/, '')}/storage/v1/object/public/${BUCKET}/`;
+
+  /**
+   * 收到的任何訊息（資料庫、即時推送、守門函式的回傳）都先經過檢查，
+   * 不合格的回傳 null，由呼叫的地方丟掉。檢查項目見 docs/architecture.md 9.5。
+   */
+  function toMessage(raw: unknown): Message | null {
+    const message = parseMessageRow(raw, {
+      imageUrlOf: (path) => client.storage.from(BUCKET).getPublicUrl(path).data.publicUrl,
+      imageUrlPrefix,
+      onReject: (reason) => console.warn('[chat] 已丟棄一則不合格的訊息：', reason),
+    });
+    if (message?.imageUrl) imagePaths.set(message.id, (raw as MessageRow).image_path!);
+    return message;
+  }
+
+  function toMessages(rows: unknown): Message[] {
+    if (!Array.isArray(rows)) return [];
+    return rows.map(toMessage).filter((m): m is Message => m !== null);
   }
 
   // ---------- 線上名單（Presence） ----------
@@ -163,9 +173,10 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
       if (error) return; // 網路不好，下一輪再試
       if (data !== 'ok') {
         nickname = null;
+        inRoom = false;
         stopHeartbeat();
         void channel?.untrack();
-      } else if (channelReady) {
+      } else if (channelReady && inRoom) {
         void channel?.track({ nickname });
       }
     } catch {
@@ -187,7 +198,9 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
         result = await client.rpc(name, args);
       } else {
         nickname = null;
+        inRoom = false;
         stopHeartbeat();
+        void channel?.untrack();
       }
     }
     if (result.error) throw toChatError(result.error);
@@ -222,10 +235,10 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
     channel = client
       .channel('chat-room', { config: { presence: { key: userId } } })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) =>
-        emit('message:new', toMessage(payload.new as MessageRow)),
+        emitMessage('message:new', toMessage(payload.new)),
       )
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' }, (payload) =>
-        emit('message:updated', toMessage(payload.new as MessageRow)),
+        emitMessage('message:updated', toMessage(payload.new)),
       )
       .on('presence', { event: 'sync' }, () => {
         presenceReady = true; // 第一次同步完成後，才開始顯示「某某進入／離開」
@@ -247,7 +260,7 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
         if (status === 'SUBSCRIBED') {
           channelReady = true;
           markSubscribed();
-          if (nickname) void channel?.track({ nickname }); // 斷線重連後，重新宣告自己在線上
+          if (nickname && inRoom) void channel?.track({ nickname }); // 斷線重連後，重新宣告自己在線上
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
           channelReady = false;
         }
@@ -265,8 +278,10 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) void renewClaim(); // 手機放背景時計時器會變慢，回來馬上續租
     });
-    // 關掉分頁時，盡力讓代號馬上釋放（keepalive 讓請求在頁面關閉後仍能送出）
+    // 關掉分頁時：先主動離開線上名單（不等伺服器發現連線斷了），再盡力讓代號馬上釋放
+    // （keepalive 讓請求在頁面關閉後仍能送出）
     window.addEventListener('pagehide', () => {
+      if (inRoom) void channel?.untrack();
       if (!nickname || !accessToken) return;
       void fetch(`${config.url}/rest/v1/rpc/release_nickname`, {
         method: 'POST',
@@ -298,6 +313,7 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
       if (error) throw toChatError(error);
       if (data === 'ok') {
         nickname = name;
+        inRoom = true;
         await Promise.race([subscribed, new Promise((resolve) => setTimeout(resolve, 5000))]);
         void channel?.track({ nickname: name });
         startHeartbeat();
@@ -307,9 +323,16 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
 
     async releaseNickname() {
       nickname = null;
+      inRoom = false;
       stopHeartbeat();
       void channel?.untrack();
       await client.rpc('release_nickname');
+    },
+
+    async leavePresence() {
+      // 只離開線上名單；代號與續租照舊，直到新代號登記成功才換掉
+      inRoom = false;
+      await channel?.untrack();
     },
 
     async loadLatest(limit) {
@@ -320,7 +343,7 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
         .order('id', { ascending: false })
         .limit(limit);
       if (error) throw toChatError(error);
-      return (data as MessageRow[]).map(toMessage).reverse();
+      return toMessages(data).reverse();
     },
 
     async loadOlder(before: Cursor, limit) {
@@ -334,7 +357,7 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
         .order('id', { ascending: false })
         .limit(limit);
       if (error) throw toChatError(error);
-      return (data as MessageRow[]).map(toMessage).reverse();
+      return toMessages(data).reverse();
     },
 
     async loadChangedSince(since) {
@@ -348,9 +371,8 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
           .order('id', { ascending: true })
           .range(page * PAGE, page * PAGE + PAGE - 1);
         if (error) throw toChatError(error);
-        const rows = data as MessageRow[];
-        out.push(...rows.map(toMessage));
-        if (rows.length < PAGE) break;
+        out.push(...toMessages(data));
+        if (!Array.isArray(data) || data.length < PAGE) break;
       }
       return out;
     },
@@ -368,11 +390,11 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
         if (error) throw toUploadError(error);
       }
       try {
-        const row = await callRpc<MessageRow>('send_message', {
+        const row = await callRpc<unknown>('send_message', {
           p_text: (input.text ?? '').trim(),
           p_image_path: imagePath,
         });
-        emit('message:new', toMessage(row)); // 即時推送也會送一份，畫面會自動去重
+        emitMessage('message:new', toMessage(row)); // 即時推送也會送一份，畫面會自動去重
       } catch (error) {
         // 訊息沒送成功，就把剛上傳的圖片收回來，不留垃圾檔
         if (imagePath) void client.storage.from(BUCKET).remove([imagePath]);
@@ -381,14 +403,14 @@ export function createSupabaseChatService(config: SupabaseConfig): ChatService {
     },
 
     async editMessage(id, text) {
-      const row = await callRpc<MessageRow>('edit_message', { p_id: id, p_text: text.trim() });
-      emit('message:updated', toMessage(row));
+      const row = await callRpc<unknown>('edit_message', { p_id: id, p_text: text.trim() });
+      emitMessage('message:updated', toMessage(row));
     },
 
     async deleteMessage(id) {
       const imagePath = imagePaths.get(id);
-      const row = await callRpc<MessageRow>('delete_message', { p_id: id });
-      emit('message:updated', toMessage(row));
+      const row = await callRpc<unknown>('delete_message', { p_id: id });
+      emitMessage('message:updated', toMessage(row));
       // 順便刪掉圖片檔（盡力而為，失敗不影響訊息已被刪除）
       if (imagePath) {
         imagePaths.delete(id);

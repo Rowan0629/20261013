@@ -68,6 +68,8 @@ export function createMockChatService(): ChatService & { controls: MockControls 
 
   let userId = '';
   let nickname: string | null = null;
+  /** 有代號，而且人在聊天室裡（換代號時代號保留，但人不在名單上） */
+  let inRoom = false;
   let offline = false;
   let lastCreated = Date.now();
   let started = false;
@@ -85,7 +87,7 @@ export function createMockChatService(): ChatService & { controls: MockControls 
 
   function onlineUsers(): OnlineUser[] {
     const list: OnlineUser[] = [];
-    if (nickname) list.push({ userId, nickname });
+    if (nickname && inRoom) list.push({ userId, nickname });
     for (const name of ALL_BOTS) {
       if (onlineBots.has(name)) list.push({ userId: `bot:${name}`, nickname: name });
     }
@@ -213,12 +215,19 @@ export function createMockChatService(): ChatService & { controls: MockControls 
       const key = name.toLowerCase();
       for (const bot of onlineBots) if (bot.toLowerCase() === key) return 'taken';
       nickname = name;
+      inRoom = true;
       emitPresence();
       return 'ok';
     },
 
     async releaseNickname() {
       nickname = null;
+      inRoom = false;
+      emitPresence();
+    },
+
+    async leavePresence() {
+      inRoom = false;
       emitPresence();
     },
 
